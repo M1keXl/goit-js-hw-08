@@ -31,11 +31,9 @@ function fillFormOnRefresh(key) {
   const dataToFill = load(key);
 
   for (prop in dataToFill) {
-    if (dataToFill) {
+ 
       form[prop].value = dataToFill[prop];
-    } else {
-      form[prop].value = '';
-    }
+    
   }
 }
 function save(key, value) {
