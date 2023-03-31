@@ -1,62 +1,54 @@
-
 import throttle from 'lodash.throttle';
-
-const LOCALSTORAGE_KEY = 'feedback-form-state';
-const form = document.querySelector('.feedback-form');
-const formData = {};
+const STORAGE_KEY = `feedback-form-state`;
+const form = document.querySelector(`.feedback-form`);
 
 
-form.addEventListener('submit', onFormSubmit);
-form.addEventListener('input', throttle(collectFormData, 500));
+form.addEventListener(`input`, throttle(onInputChange, 500));
+form.addEventListener(`submit`, onBtnSubmitClick);
 
-fillFormOnRefresh(LOCALSTORAGE_KEY);
+checkStorageContent();
 
-function onFormSubmit(e) {
-  e.preventDefault();
-
-  e.currentTarget.reset();
-  console.log(load(LOCALSTORAGE_KEY));
-
-  remove(LOCALSTORAGE_KEY);
+function onInputChange(evt){
+const fedbackForm = {
+    email:form.email.value,
+    message:form.message.value
 }
 
-function collectFormData(e) {
-  formData[e.target.name] = e.target.value;
+const fedbackFormJSON = JSON.stringify(fedbackForm);
 
-  console.log(formData);
-  save(LOCALSTORAGE_KEY, { ...load(LOCALSTORAGE_KEY), ...formData });
+localStorage.setItem(STORAGE_KEY,  fedbackFormJSON);
+
+};
+
+
+function checkStorageContent (){
+const savedfedbackForm = localStorage.getItem(STORAGE_KEY);
+if(savedfedbackForm){
 }
+try {
+    const fedbackForm = JSON.parse(savedfedbackForm);
+    form.email.value = fedbackForm.email;
+    form.message.value = fedbackForm.message;
+  } catch (error) {
+    console.log(error.name); 
+    console.log(error.message); 
+  }
 
-function fillFormOnRefresh(key) {
-  const dataToFill = load(key);
+};
 
-  for (prop in dataToFill) {
- 
-      form[prop].value = dataToFill[prop];
+function onBtnSubmitClick(evt){
+    evt.preventDefault();
+    const savedfedbackForm = localStorage.getItem(STORAGE_KEY);
+    try {
+        const fedbackForm = JSON.parse(savedfedbackForm);
+       console.log(fedbackForm);
+      } catch (error) {
+        console.log(error.name); 
+        console.log(error.message); 
+      }
+
+    evt.currentTarget.reset();
+    localStorage.removeItem(STORAGE_KEY);
     
-  }
-}
-function save(key, value) {
-  try {
-    localStorage.setItem(key, JSON.stringify(value));
-  } catch (error) {
-    console.error(error.message);
-  }
-}
 
-function load(key) {
-  try {
-    const savedData = localStorage.getItem(key);
-    return savedData === null ? undefined : JSON.parse(savedData);
-  } catch (error) {
-    console.error(error.message);
-  }
-}
-
-function remove(key) {
-  try {
-    localStorage.removeItem(key);
-  } catch (error) {
-    console.error(error.message);
-  }
-}
+};
